@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>    
+    <title> JavaScript</title>
+</head>
+<body>
+    <button onclick="showTab('astronomia')">Astronomía</button>
+    <button onclick="showTab('salud')">Salud</button>
+    <button onclick="showTab('medio-ambiente')">Medio Ambiente</button>
+    <div id="astronomia">
+        <h3>1. Brillo Estelar</h3>
+        <input type="number" id="magnitude">
+        <button onclick="classifyStar()">Clasificar</button>
+        <div id="star-result"></div>
+        <h3>2. Distancias Planetarias</h3>
+        <input type="number" id="planet-count" value="3">
+        <div id="planet-inputs"></div>
+        <button onclick="calculateDistance()">Calcular</button>
+        <div id="distance-result"></div>
+        <h3>3. Cráteres Lunares</h3>
+        <input type="number" id="crater">
+        <button onclick="addCrater()">Agregar</button>
+        <button onclick="finishCraters()">Finalizar</button>
+        <div id="crater-result"></div>
+        <h3>4. Cuerpo Celeste</h3>
+        <select id="celestial">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+        </select>
+        <button onclick="identifyBody()">Identificar</button>
+        <div id="celestial-result"></div>
+        <h3>5. Niveles de Luz</h3>
+        <input type="number" id="lux">
+        <button onclick="addLux()">Agregar</button>
+        <div id="lux-result"></div>
+    </div>
+    <div id="salud" style="display:none">
+        <h3>1. Presión Arterial</h3>
+        <input type="number" id="sistolica">
+        <input type="number" id="diastolica">
+        <button onclick="classifyPressure()">Clasificar</button>
+        <div id="pressure-result"></div>
+        <h3>2. Temperaturas</h3>
+        <input type="number" id="patient-count" value="3">
+        <div id="patient-inputs"></div>
+        <button onclick="calculateTemp()">Calcular</button>
+        <div id="temp-result"></div>
+        <h3>3. Pacientes con Fiebre</h3>
+        <input type="number" id="fever">
+        <button onclick="addFever()">Agregar</button>
+        <button onclick="finishFever()">Finalizar</button>
+        <div id="fever-result"></div>
+        <h3>4. TRIAGE</h3>
+        <select id="triage">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+        </select>
+        <button onclick="classifyTriage()">Clasificar</button>
+        <div id="triage-result"></div>
+        <h3>5. SpO2</h3>
+        <input type="number" id="spo2">
+        <button onclick="addSpo2()">Agregar</button>
+        <div id="spo2-result"></div>
+    </div>
+
+    <div id="medio-ambiente" style="display:none">
+        <h3>1. Calidad del Aire</h3>
+        <input type="number" id="aqi">
+        <button onclick="classifyAir()">Clasificar</button>
+        <div id="air-result"></div>
+        <h3>2. Niveles de Ruido</h3>
+        <input type="number" id="noise-count" value="3">
+        <div id="noise-inputs"></div>
+        <button onclick="calculateNoise()">Calcular</button>
+        <div id="noise-result"></div>
+        <h3>3. Focos de Calor</h3>
+        <input type="number" id="heat">
+        <button onclick="addHeat()">Agregar</button>
+        <button onclick="finishHeat()">Finalizar</button>
+        <div id="heat-result"></div>
+        <h3>4. Residuos</h3>
+        <select id="waste">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+        </select>
+        <button onclick="classifyWaste()">Clasificar</button>
+        <div id="waste-result"></div>
+        <h3>5. Nivel del Río</h3>
+        <input type="number" id="river">
+        <button onclick="addRiver()">Agregar</button>
+        <div id="river-result"></div>
+    </div>
+    <script>
+        let craters = [];
+        let luxValues = [];
+        let fevers = [];
+        let spo2Values = [];
+        let heats = [];
+        let rivers = [];
+        function showTab(tabName) {
+            document.getElementById('astronomia').style.display = 'none';
+            document.getElementById('salud').style.display = 'none';
+            document.getElementById('medio-ambiente').style.display = 'none';
+            document.getElementById(tabName).style.display = 'block';
+        }
+        function generateInputs(countId, containerId, placeholder) {
+            const count = parseInt(document.getElementById(countId).value) || 3;
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            
+            for (let i = 0; i < count; i++) {
+                const input = document.createElement('input');
+                input.type = 'number';
+                input.placeholder = placeholder;
+                input.id = `${containerId}-${i}`;
+                container.appendChild(input);
+                container.appendChild(document.createElement('br'));
+            }
+        }
+        function classifyStar() {
+            const mag = parseFloat(document.getElementById('magnitude').value);
+            const result = document.getElementById('star-result');
+            
+            if (mag <= 1) result.textContent = 'Extremadamente brillante';
+            else if (mag <= 3) result.textContent = 'Muy brillante';
+            else if (mag <= 6) result.textContent = 'Brillante';
+            else if (mag <= 10) result.textContent = 'Débil';
+            else result.textContent = 'No visible';
+        }
+        function calculateDistance() {
+            const count = parseInt(document.getElementById('planet-count').value) || 3;
+            let total = 0;
+            let valid = 0;
+            for (let i = 0; i < count; i++) {
+                const input = document.getElementById(`planet-inputs-${i}`);
+                if (input && input.value) {
+                    total += parseFloat(input.value);
+                    valid++;
+                }
+            }           
+            const avg = valid > 0 ? total / valid : 0;
+            document.getElementById('distance-result').textContent = `Promedio: ${avg.toFixed(2)} millones de km`;
+        }        
+        function addCrater() {
+            const diameter = parseFloat(document.getElementById('crater').value);
+            if (diameter) {
+                craters.push(diameter);
+                document.getElementById('crater-result').textContent = `Agregado: ${diameter} km`;
+                document.getElementById('crater').value = '';
+            }
+        }        
+        function finishCraters() {
+            const large = craters.filter(d => d > 50).length;
+            document.getElementById('crater-result').textContent = `Total: ${craters.length}, Grandes: ${large}`;
+            craters = [];
+        }        
+        function identifyBody() {
+            const code = document.getElementById('celestial').value;
+            const bodies = ['', 'Estrella', 'Planeta', 'Cometa', 'Asteroide', 'Galaxia'];
+            document.getElementById('celestial-result').textContent = bodies[code];
+        }        
+        function addLux() {
+            const lux = parseFloat(document.getElementById('lux').value);
+            if (lux) {
+                luxValues.push(lux);
+                let msg = `Agregado: ${lux} lux`;
+                if (lux < 5) msg += ' - NOCHE PROFUNDA';
+                document.getElementById('lux-result').textContent = msg;
+                document.getElementById('lux').value = '';
+            }
+        }        
+        function classifyPressure() {
+            const sis = parseInt(document.getElementById('sistolica').value);
+            const dia = parseInt(document.getElementById('diastolica').value);
+            const result = document.getElementById('pressure-result');            
+            if (sis < 120 && dia < 80) result.textContent = 'Normal';
+            else if (sis <= 129 && dia < 80) result.textContent = 'Elevada';
+            else if (sis <= 139 || dia <= 89) result.textContent = 'HTA Grado 1';
+            else result.textContent = 'HTA Grado 2';
+        }        
+        function calculateTemp() {
+            const count = parseInt(document.getElementById('patient-count').value) || 3;
+            let total = 0;
+            let valid = 0;            
+            for (let i = 0; i < count; i++) {
+                const input = document.getElementById(`patient-inputs-${i}`);
+                if (input && input.value) {
+                    total += parseFloat(input.value);
+                    valid++;
+                }
+            }            
+            const avg = valid > 0 ? total / valid : 0;
+            document.getElementById('temp-result').textContent = `Promedio: ${avg.toFixed(1)}°C`;
+        }        
+        function addFever() {
+            const temp = parseFloat(document.getElementById('fever').value);
+            if (temp) {
+                fevers.push(temp);
+                document.getElementById('fever-result').textContent = `Agregado: ${temp}°C`;
+                document.getElementById('fever').value = '';
+            }
+        }        
+        function finishFever() {
+            const withFever = fevers.filter(t => t >= 38).length;
+            document.getElementById('fever-result').textContent = `Total: ${fevers.length}, Con fiebre: ${withFever}`;
+            fevers = [];
+        }        
+        function classifyTriage() {
+            const code = document.getElementById('triage').value;
+            const triages = ['', 'Rojo', 'Amarillo', 'Verde', 'Azul'];
+            document.getElementById('triage-result').textContent = triages[code];
+        }        
+        function addSpo2() {
+            const spo2 = parseInt(document.getElementById('spo2').value);
+            if (spo2) {
+                spo2Values.push(spo2);
+                let msg = `Agregado: ${spo2}%`;
+                if (spo2 < 90) msg += ' - SATURACIÓN BAJA';
+                document.getElementById('spo2-result').textContent = msg;
+                document.getElementById('spo2').value = '';
+            }
+        }        
+        function classifyAir() {
+            const aqi = parseInt(document.getElementById('aqi').value);
+            const result = document.getElementById('air-result');            
+            if (aqi <= 50) result.textContent = 'Bueno';
+            else if (aqi <= 100) result.textContent = 'Moderado';
+            else if (aqi <= 150) result.textContent = 'Dañino para grupos sensibles';
+            else if (aqi <= 200) result.textContent = 'Dañino';
+            else if (aqi <= 300) result.textContent = 'Muy dañino';
+            else result.textContent = 'Peligroso';
+        }        
+        function calculateNoise() {
+            const count = parseInt(document.getElementById('noise-count').value) || 3;
+            let total = 0;
+            let valid = 0;            
+            for (let i = 0; i < count; i++) {
+                const input = document.getElementById(`noise-inputs-${i}`);
+                if (input && input.value) {
+                    total += parseFloat(input.value);
+                    valid++;
+                }
+            }            
+            const avg = valid > 0 ? total / valid : 0;
+            document.getElementById('noise-result').textContent = `Promedio: ${avg.toFixed(1)} dB`;
+        }        
+        function addHeat() {
+            const temp = parseFloat(document.getElementById('heat').value);
+            if (temp) {
+                heats.push(temp);
+                document.getElementById('heat-result').textContent = `Agregado: ${temp}°C`;
+                document.getElementById('heat').value = '';
+            }
+        }        
+        function finishHeat() {
+            const hotspots = heats.filter(t => t > 45).length;
+            document.getElementById('heat-result').textContent = `Total: ${heats.length}, Focos de calor: ${hotspots}`;
+            heats = [];
+        }        
+        function classifyWaste() {
+            const code = document.getElementById('waste').value;
+            const wastes = ['', 'Orgánico', 'Plástico', 'Papel/Cartón', 'Vidrio'];
+            document.getElementById('waste-result').textContent = wastes[code];
+        }        
+        function addRiver() {
+            const level = parseFloat(document.getElementById('river').value);
+            if (level) {
+                rivers.push(level);
+                let msg = `Agregado: ${level} m`;
+                if (level > 3) msg += ' - NIVEL PELIGROSO';
+                document.getElementById('river-result').textContent = msg;
+                document.getElementById('river').value = '';
+            }
+        }        
+        window.onload = function() {
+            generateInputs('planet-count', 'planet-inputs', 'Distancia (millones km)');
+            generateInputs('patient-count', 'patient-inputs', 'Temperatura (°C)');
+            generateInputs('noise-count', 'noise-inputs', 'Ruido (dB)');
+        };
+    </script>
+</body>
+</html>
